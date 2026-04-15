@@ -9,6 +9,16 @@
 .location { font-size: 0.8rem; color: var(--ink-3); margin-top: 2px; }
 .pageTitle { font-size: 1.1rem; font-weight: 700; }
 .notifBtn { background: none; border: none; font-size: 1.2rem; }
+.headerRight { display: flex; align-items: center; gap: 8px; }
+.exitBtn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  font-weight: 500;
+}
 
 .balanceCard {
   background: var(--accent);

@@ -77,7 +77,10 @@ export default function EmployerHome({ nav }) {
               <div className={styles.greeting}>안녕하세요, 사장님 👋</div>
               <div className={styles.location}>이마트 해운대점</div>
             </div>
-            <div className={styles.headerBadge}>고용주</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div className={styles.headerBadge}>고용주</div>
+              <button className={styles.exitBtn} onClick={() => nav('landing')}>나가기</button>
+            </div>
           </div>
 
           {/* 통계 요약 */}

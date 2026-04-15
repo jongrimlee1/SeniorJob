@@ -6,6 +6,7 @@
 .location { font-size: 0.8rem; color: var(--ink-3); margin-top: 2px; }
 .pageTitle { font-size: 1.1rem; font-weight: 700; }
 .headerBadge { background: var(--accent-2-light); color: var(--accent-2); font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+.exitBtn { background: none; border: 1px solid var(--border); border-radius: 16px; padding: 4px 10px; font-size: 0.72rem; color: var(--ink-3); font-weight: 500; }
 
 .statsGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
 .statCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; text-align: center; }

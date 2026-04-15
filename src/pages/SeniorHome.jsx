@@ -80,7 +80,10 @@ export default function SeniorHome({ nav }) {
                 📍 {locLoading ? '위치 확인 중...' : myAddress ? `${myAddress} 근처` : '위치 정보 없음'}
               </div>
             </div>
-            <button className={styles.notifBtn}>🔔</button>
+            <div className={styles.headerRight}>
+              <button className={styles.notifBtn}>🔔</button>
+              <button className={styles.exitBtn} onClick={() => nav('landing')}>나가기</button>
+            </div>
           </div>
 
           {/* Balance card */}
@@ -248,6 +251,7 @@ export default function SeniorHome({ nav }) {
                         key={job.id} job={job}
                         applied={applied.includes(job.id)}
                         onApply={() => setApplied(prev => [...prev, job.id])}
+                        onClick={() => nav('public-job-detail', job)}
                       />
                     ))
                   )}

@@ -1,0 +1,126 @@
+.wrap { min-height: 100vh; background: var(--bg); padding-bottom: 100px; }
+
+/* 헤더 */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1rem 0.5rem;
+  position: sticky; top: 0;
+  background: var(--bg);
+  z-index: 10;
+  border-bottom: 1px solid var(--border);
+}
+.backBtn {
+  background: none; border: none;
+  font-size: 0.9rem; color: var(--ink-3); font-weight: 600;
+  padding: 6px 0;
+}
+.typePill {
+  font-size: 0.72rem; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px; border: 1px solid;
+}
+
+/* 히어로 */
+.hero {
+  padding: 1.5rem 1rem 1.25rem;
+  background: var(--bg-card);
+}
+.govBadge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #EFF6FF; border: 1px solid #BFDBFE;
+  color: #1E40AF; font-size: 0.68rem; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px; margin-bottom: 0.75rem;
+}
+.programName {
+  font-size: 1.2rem; font-weight: 800; color: var(--ink);
+  line-height: 1.35; margin-bottom: 6px;
+}
+.orgName { font-size: 0.8rem; color: var(--ink-3); margin-bottom: 6px; }
+.distBadge {
+  display: inline-block;
+  background: var(--accent-light); color: var(--accent);
+  font-size: 0.72rem; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px;
+}
+
+/* 정보 바 */
+.infoBar {
+  display: flex; align-items: center;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+.infoItem { flex: 1; text-align: center; }
+.infoLabel { font-size: 0.65rem; color: var(--ink-4); margin-bottom: 3px; }
+.infoVal { font-size: 0.95rem; font-weight: 700; color: var(--ink); }
+.infoDiv { width: 1px; height: 32px; background: var(--border); }
+
+/* 섹션 */
+.section {
+  background: var(--bg-card);
+  margin: 0 0 8px;
+  padding: 1rem 1rem;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.sectionTitle {
+  font-size: 0.82rem; font-weight: 700; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  margin-bottom: 0.6rem;
+}
+.infoRow {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 0.9rem; color: var(--ink);
+  margin-bottom: 6px; line-height: 1.5;
+}
+.rowIcon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+/* 공공 안내 박스 */
+.noticeBox {
+  margin: 0 0 8px;
+  background: #F0FDF4;
+  border-top: 1px solid #A7F3D0;
+  border-bottom: 1px solid #A7F3D0;
+  padding: 1rem;
+}
+.noticeTitle { font-size: 0.82rem; font-weight: 700; color: #065F46; margin-bottom: 5px; }
+.noticeDesc { font-size: 0.78rem; color: #047857; line-height: 1.65; }
+
+/* 연락처 */
+.contactBox { display: flex; flex-direction: column; gap: 10px; }
+.contactRow { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--ink); }
+.contactNum { font-weight: 600; }
+.contactHint { font-size: 0.75rem; color: var(--ink-3); }
+.callBtn {
+  display: block; text-align: center;
+  background: #EFF6FF; border: 1px solid #BFDBFE;
+  color: #1E40AF; font-size: 0.85rem; font-weight: 700;
+  border-radius: 10px; padding: 10px;
+  text-decoration: none;
+}
+
+/* CTA */
+.cta {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  max-width: 480px; margin: 0 auto;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  padding: 12px 1rem max(12px, env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; gap: 8px;
+}
+.interestBtn {
+  background: var(--accent); color: white;
+  border: none; border-radius: 12px;
+  padding: 14px; font-size: 0.95rem; font-weight: 700;
+  transition: opacity 0.2s;
+}
+.interestBtn.interested { background: #6B7280; }
+.callBtnLarge {
+  display: block; text-align: center;
+  background: white; border: 1.5px solid #BFDBFE;
+  color: #1E40AF; font-size: 0.9rem; font-weight: 700;
+  border-radius: 12px; padding: 12px;
+  text-decoration: none;
+}
+.ctaSub { font-size: 0.68rem; color: var(--ink-4); text-align: center; margin: 0; }

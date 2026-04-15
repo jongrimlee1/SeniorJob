@@ -5,6 +5,7 @@ import JobDetail from './pages/JobDetail.jsx'
 import QRComplete from './pages/QRComplete.jsx'
 import LandingPage from './pages/LandingPage.jsx'
 import StatsPage from './pages/StatsPage.jsx'
+import PublicJobDetail from './pages/PublicJobDetail.jsx'
 
 export default function App() {
   const [screen, setScreen] = useState('landing') // landing | senior | employer | job-detail | qr-complete | stats
@@ -23,6 +24,7 @@ export default function App() {
   if (screen === 'job-detail') return <JobDetail job={selectedJob} nav={nav} />
   if (screen === 'qr-complete') return <QRComplete job={selectedJob} nav={nav} />
   if (screen === 'stats') return <StatsPage nav={nav} />
+  if (screen === 'public-job-detail') return <PublicJobDetail job={selectedJob} nav={nav} />
 
   return null
 }

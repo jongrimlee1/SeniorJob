@@ -8,11 +8,11 @@ const TYPE_COLOR = {
   '취업알선형':   '#0E7490',
 }
 
-export default function PublicJobCard({ job, onApply, applied }) {
+export default function PublicJobCard({ job, onApply, applied, onClick }) {
   const typeColor = job.color || TYPE_COLOR[job.type] || '#374151'
 
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onClick={onClick} style={onClick ? { cursor: 'pointer' } : {}}>
       {/* 상단: 정부 배지 + 유형 + 거리 */}
       <div className={styles.top}>
         <div className={styles.topLeft}>
@@ -100,7 +100,7 @@ export default function PublicJobCard({ job, onApply, applied }) {
         </div>
         <button
           className={`${styles.applyBtn} ${applied ? styles.applied : ''}`}
-          onClick={onApply}
+          onClick={e => { e.stopPropagation(); onApply && onApply() }}
           disabled={applied}
         >
           {applied ? '관심 등록됨 ✓' : '관심 등록'}
