@@ -1,11 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
-import { geocodeAddress, haversine, formatDistance } from './useLocation.js'
+import { useState, useEffect } from 'react'
+import { haversine, formatDistance } from './useLocation.js'
+import { lookupRegionCoords } from '../data/districtCoords.js'
 
 const ENDPOINT = '/odcloud/api/15050148/v1/uddi:5a9fe759-5344-41ef-94c1-9de71e3e156f'
 const SERVICE_KEY = import.meta.env.VITE_ODCLOUD_KEY
-
-// 세션 내 지역 좌표 캐시 (동일 지역 중복 요청 방지)
-const regionCache = new Map()
 
 const TYPE_COLOR = {
   '공공형':       '#15803D',
@@ -32,20 +30,17 @@ function transform(item) {
   }
   const rawType = item['사업유형'] ?? ''
   const type    = typeAlias[rawType] || rawType || '기타'
-
   const region  = item['관할시군구'] ?? ''
-  const orgName = item['수행기관명'] ?? ''
 
   return {
     id:           item['사업번호'] ?? Math.random().toString(36).slice(2),
     programName:  item['사업명'] ?? '사업명 미상',
-    executingOrg: orgName,
+    executingOrg: item['수행기관명'] ?? '',
     agencyName:   '한국노인인력개발원',
     type,
     color:        TYPE_COLOR[type] ?? '#374151',
     period,
     region,
-    address:      region,
     targetAge:    '60세 이상',
     slots:        Number(item['목표일자리수']) || 0,
     remaining:    null,
@@ -58,30 +53,31 @@ function transform(item) {
   }
 }
 
-// 고유 지역들을 순차 지오코딩 (Nominatim 1req/s 정책 준수)
-async function geocodeRegions(regions, onUpdate, cancelRef) {
-  for (let i = 0; i < regions.length; i++) {
-    if (cancelRef.current) return
-    const region = regions[i]
-    if (!regionCache.has(region)) {
-      if (i > 0) await new Promise(r => setTimeout(r, 1100))
-      if (cancelRef.current) return
-      const geo = await geocodeAddress(region)
-      regionCache.set(region, geo ?? null)
-    }
-    onUpdate(region, regionCache.get(region))
-  }
+// 좌표 기반 거리 계산 + 정렬 (룩업 테이블 사용 — 즉각적)
+function attachDistances(jobs, coords) {
+  return jobs
+    .map(j => {
+      const geo = lookupRegionCoords(j.region)
+      if (!geo) return j
+      const km = haversine(coords.lat, coords.lng, geo.lat, geo.lng)
+      return { ...j, _km: km, distance: formatDistance(km) }
+    })
+    .sort((a, b) => {
+      if (a._km == null && b._km == null) return 0
+      if (a._km == null) return 1
+      if (b._km == null) return -1
+      return a._km - b._km
+    })
 }
 
 export function usePublicJobs(coords) {
-  const [jobs, setJobs]       = useState([])
+  const [rawJobs, setRawJobs] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState(null)
-  const cancelRef             = useRef(false)
 
-  // 공공 API 페치
+  // API 페치
   useEffect(() => {
-    cancelRef.current = false
+    let cancelled = false
     setLoading(true)
     setError(null)
 
@@ -90,57 +86,19 @@ export function usePublicJobs(coords) {
     fetch(url)
       .then(r => { if (!r.ok) throw new Error(`API ${r.status}`); return r.json() })
       .then(json => {
-        if (cancelRef.current) return
-        setJobs((json.data ?? []).map(transform))
+        if (cancelled) return
+        setRawJobs((json.data ?? []).map(transform))
       })
-      .catch(e => { if (!cancelRef.current) setError(e.message) })
-      .finally(() => { if (!cancelRef.current) setLoading(false) })
+      .catch(e => { if (!cancelled) setError(e.message) })
+      .finally(() => { if (!cancelled) setLoading(false) })
 
-    return () => { cancelRef.current = true }
+    return () => { cancelled = true }
   }, [])
 
-  // 좌표 확보 후 → 지역 지오코딩 → 거리 계산 → 정렬
-  useEffect(() => {
-    if (!coords || jobs.length === 0) return
-    cancelRef.current = false
-
-    const uniqueRegions = [...new Set(jobs.map(j => j.region).filter(Boolean))]
-
-    geocodeRegions(
-      uniqueRegions.filter(r => !regionCache.has(r)),
-      (region, geo) => {
-        if (cancelRef.current || !geo) return
-        setJobs(prev =>
-          prev.map(j => {
-            if (j.region !== region || j._km != null) return j
-            const km = haversine(coords.lat, coords.lng, geo.lat, geo.lng)
-            return { ...j, _km: km, distance: formatDistance(km) }
-          })
-        )
-      },
-      cancelRef
-    ).then(() => {
-      if (cancelRef.current) return
-      // 이미 캐시된 지역들도 거리 반영
-      setJobs(prev => {
-        const updated = prev.map(j => {
-          if (j._km != null) return j
-          const geo = regionCache.get(j.region)
-          if (!geo) return j
-          const km = haversine(coords.lat, coords.lng, geo.lat, geo.lng)
-          return { ...j, _km: km, distance: formatDistance(km) }
-        })
-        return [...updated].sort((a, b) => {
-          if (a._km == null && b._km == null) return 0
-          if (a._km == null) return 1
-          if (b._km == null) return -1
-          return a._km - b._km
-        })
-      })
-    })
-
-    return () => { cancelRef.current = true }
-  }, [coords, jobs.length === 0])
+  // coords 또는 rawJobs 변경 시 거리 재계산 (룩업 테이블이라 즉각적)
+  const jobs = coords && rawJobs.length > 0
+    ? attachDistances(rawJobs, coords)
+    : rawJobs
 
   return { jobs, loading, error }
 }
