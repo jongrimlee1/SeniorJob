@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { JOBS, CATEGORIES, WORK_HISTORY } from '../data/mockData.js'
+import { CATEGORIES, WORK_HISTORY } from '../data/mockData.js'
 import { usePublicJobs } from '../hooks/usePublicJobs.js'
+import { useJobs, applyToJob } from '../hooks/useJobs.js'
 import JobCard from '../components/JobCard.jsx'
 import PublicJobCard from '../components/PublicJobCard.jsx'
 import BottomNav from '../components/BottomNav.jsx'
@@ -14,12 +15,22 @@ export default function SeniorHome({ nav }) {
   const [applied, setApplied] = useState([])
 
   const { jobs: publicJobs, loading: pubLoading, error: pubError } = usePublicJobs()
+  const { jobs: privateJobs, loading: privLoading, error: privError } = useJobs()
 
   const PUBLIC_TYPES = ['전체', ...Array.from(new Set(publicJobs.map(j => j.type))).filter(Boolean)]
 
-  const filtered = JOBS.filter(j => category === '전체' || j.category === category)
+  const filtered = privateJobs.filter(j => category === '전체' || j.category === category)
   const urgent = filtered.filter(j => j.urgent)
   const normal = filtered.filter(j => !j.urgent)
+
+  const handleApply = async (jobId) => {
+    try {
+      await applyToJob(jobId)
+      setApplied(prev => [...prev, jobId])
+    } catch (e) {
+      console.error('지원 실패:', e)
+    }
+  }
 
   const filteredPublic = publicJobs.filter(j => publicType === '전체' || j.type === publicType)
 
@@ -77,39 +88,57 @@ export default function SeniorHome({ nav }) {
                 ))}
               </div>
 
-              {urgent.length > 0 && (
+              {privLoading && (
+                <div className={styles.loadingWrap}>
+                  <div className={styles.spinner} />
+                  <span>공고 불러오는 중...</span>
+                </div>
+              )}
+
+              {privError && (
+                <div className={styles.errorBox}>
+                  <span>⚠️ 데이터를 불러오지 못했습니다</span>
+                  <span className={styles.errorSub}>{privError}</span>
+                </div>
+              )}
+
+              {!privLoading && !privError && (
                 <>
+                  {urgent.length > 0 && (
+                    <>
+                      <div className={styles.sectionTitle}>
+                        <span className={styles.urgentBadge}>🔥 급구</span> 오늘 바로 시작
+                      </div>
+                      {urgent.map(job => (
+                        <JobCard
+                          key={job.id}
+                          job={job}
+                          applied={applied.includes(job.id)}
+                          onClick={() => nav('job-detail', job)}
+                          onApply={(e) => { e.stopPropagation(); handleApply(job.id) }}
+                        />
+                      ))}
+                    </>
+                  )}
+
                   <div className={styles.sectionTitle}>
-                    <span className={styles.urgentBadge}>🔥 급구</span> 오늘 바로 시작
+                    내 주변 일자리
+                    <span className={styles.countBadge}>{normal.length}건</span>
                   </div>
-                  {urgent.map(job => (
+                  {normal.length === 0 && (
+                    <div className={styles.emptyBox}>등록된 공고가 없습니다</div>
+                  )}
+                  {normal.map(job => (
                     <JobCard
                       key={job.id}
                       job={job}
                       applied={applied.includes(job.id)}
                       onClick={() => nav('job-detail', job)}
-                      onApply={(e) => {
-                        e.stopPropagation()
-                        setApplied(prev => [...prev, job.id])
-                      }}
+                      onApply={(e) => { e.stopPropagation(); handleApply(job.id) }}
                     />
                   ))}
                 </>
               )}
-
-              <div className={styles.sectionTitle}>내 주변 일자리</div>
-              {normal.map(job => (
-                <JobCard
-                  key={job.id}
-                  job={job}
-                  applied={applied.includes(job.id)}
-                  onClick={() => nav('job-detail', job)}
-                  onApply={(e) => {
-                    e.stopPropagation()
-                    setApplied(prev => [...prev, job.id])
-                  }}
-                />
-              ))}
             </>
           )}
 

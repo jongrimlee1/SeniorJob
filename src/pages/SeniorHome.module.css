@@ -118,6 +118,13 @@
 }
 .errorSub { font-size: 0.72rem; color: #EF4444; }
 
+.emptyBox {
+  text-align: center;
+  padding: 2rem 0;
+  font-size: 0.82rem;
+  color: var(--ink-3);
+}
+
 .countBadge {
   font-size: 0.72rem;
   font-weight: 600;

@@ -1,30 +1,70 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { APPLICANTS } from '../data/mockData.js'
+import { postJob } from '../hooks/useJobs.js'
+import { supabase } from '../supabase.js'
 import BottomNav from '../components/BottomNav.jsx'
 import styles from './EmployerHome.module.css'
 
 const FORM_INIT = {
-  task: '', category: '매장', pay: '', hours: '', timeSlot: '', date: '', address: '', desc: '', urgent: false,
+  company: '', task: '', category: '매장', pay: '', hours: '', timeSlot: '', date: '', address: '', desc: '', urgent: false,
 }
 
 export default function EmployerHome({ nav }) {
   const [tab, setTab] = useState('home')
   const [form, setForm] = useState(FORM_INIT)
   const [posted, setPosted] = useState(false)
-  const [postedJobs, setPostedJobs] = useState([
-    { id: 1, task: '매장 상품 진열', date: '오늘', applicants: 3, status: '매칭 완료' },
-    { id: 2, task: '재고 정리 및 검수', date: '내일', applicants: 1, status: '구인 중' },
-  ])
+  const [posting, setPosting] = useState(false)
+  const [postedJobs, setPostedJobs] = useState([])
 
-  const handlePost = () => {
+  // Supabase에서 내 공고 목록 로드
+  useEffect(() => {
+    supabase
+      .from('jobs')
+      .select('id, task, date_label, status')
+      .order('created_at', { ascending: false })
+      .limit(20)
+      .then(({ data }) => {
+        if (data) {
+          setPostedJobs(data.map(j => ({
+            id: j.id,
+            task: j.task,
+            date: j.date_label,
+            applicants: 0,
+            status: j.status === '구인중' ? '구인 중' : j.status,
+          })))
+        }
+      })
+  }, [tab]) // 탭 전환 시마다 갱신
+
+  // 지원자 수 로드
+  useEffect(() => {
+    if (postedJobs.length === 0) return
+    const ids = postedJobs.map(j => j.id)
+    supabase
+      .from('applications')
+      .select('job_id')
+      .in('job_id', ids)
+      .then(({ data }) => {
+        if (!data) return
+        const counts = {}
+        data.forEach(a => { counts[a.job_id] = (counts[a.job_id] || 0) + 1 })
+        setPostedJobs(prev => prev.map(j => ({ ...j, applicants: counts[j.id] || 0 })))
+      })
+  }, [postedJobs.length])
+
+  const handlePost = async () => {
     if (!form.task || !form.pay || !form.hours) return
-    setPostedJobs(prev => [
-      { id: Date.now(), task: form.task, date: form.date || '오늘', applicants: 0, status: '구인 중' },
-      ...prev,
-    ])
-    setPosted(true)
-    setForm(FORM_INIT)
-    setTimeout(() => { setPosted(false); setTab('manage') }, 1500)
+    setPosting(true)
+    try {
+      await postJob(form)
+      setPosted(true)
+      setForm(FORM_INIT)
+      setTimeout(() => { setPosted(false); setTab('manage') }, 1500)
+    } catch (e) {
+      console.error('공고 등록 실패:', e)
+    } finally {
+      setPosting(false)
+    }
   }
 
   return (
@@ -104,6 +144,16 @@ export default function EmployerHome({ nav }) {
             </div>
           ) : (
             <div className={styles.formWrap}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>업체명</label>
+                <input
+                  className={styles.input}
+                  placeholder="예: 이마트 해운대점"
+                  value={form.company}
+                  onChange={e => setForm(p => ({ ...p, company: e.target.value }))}
+                />
+              </div>
+
               <div className={styles.formGroup}>
                 <label className={styles.label}>업무 내용 *</label>
                 <input
@@ -200,10 +250,11 @@ export default function EmployerHome({ nav }) {
               )}
 
               <button
-                className={`${styles.postBtn} ${(!form.task || !form.pay || !form.hours) ? styles.postBtnDisabled : ''}`}
+                className={`${styles.postBtn} ${(!form.task || !form.pay || !form.hours || posting) ? styles.postBtnDisabled : ''}`}
                 onClick={handlePost}
+                disabled={!form.task || !form.pay || !form.hours || posting}
               >
-                공고 등록하기
+                {posting ? '등록 중...' : '공고 등록하기'}
               </button>
             </div>
           )}
