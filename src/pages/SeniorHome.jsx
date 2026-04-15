@@ -1,17 +1,27 @@
 import { useState } from 'react'
 import { JOBS, CATEGORIES, WORK_HISTORY } from '../data/mockData.js'
+import { usePublicJobs } from '../hooks/usePublicJobs.js'
 import JobCard from '../components/JobCard.jsx'
+import PublicJobCard from '../components/PublicJobCard.jsx'
 import BottomNav from '../components/BottomNav.jsx'
 import styles from './SeniorHome.module.css'
 
 export default function SeniorHome({ nav }) {
   const [tab, setTab] = useState('home')
+  const [sourceTab, setSourceTab] = useState('private') // 'public' | 'private'
   const [category, setCategory] = useState('전체')
+  const [publicType, setPublicType] = useState('전체')
   const [applied, setApplied] = useState([])
+
+  const { jobs: publicJobs, loading: pubLoading, error: pubError } = usePublicJobs()
+
+  const PUBLIC_TYPES = ['전체', ...Array.from(new Set(publicJobs.map(j => j.type))).filter(Boolean)]
 
   const filtered = JOBS.filter(j => category === '전체' || j.category === category)
   const urgent = filtered.filter(j => j.urgent)
   const normal = filtered.filter(j => !j.urgent)
+
+  const filteredPublic = publicJobs.filter(j => publicType === '전체' || j.type === publicType)
 
   const totalEarned = WORK_HISTORY.reduce((s, h) => s + h.pay, 0)
 
@@ -36,26 +46,59 @@ export default function SeniorHome({ nav }) {
             <button className={styles.withdrawBtn}>출금하기</button>
           </div>
 
-          {/* Category */}
-          <div className={styles.catRow}>
-            {CATEGORIES.map(c => (
-              <button
-                key={c}
-                className={`${styles.catBtn} ${category === c ? styles.catActive : ''}`}
-                onClick={() => setCategory(c)}
-              >
-                {c}
-              </button>
-            ))}
+          {/* 소스 탭 — 공공 / 민간 */}
+          <div className={styles.sourceTabRow}>
+            <button
+              className={`${styles.sourceTab} ${sourceTab === 'private' ? styles.sourceTabActive : ''}`}
+              onClick={() => setSourceTab('private')}
+            >
+              🏪 민간 구인
+            </button>
+            <button
+              className={`${styles.sourceTab} ${sourceTab === 'public' ? styles.sourceTabActive : ''}`}
+              onClick={() => setSourceTab('public')}
+            >
+              🏛 공공 일자리
+            </button>
           </div>
 
-          {/* Urgent */}
-          {urgent.length > 0 && (
+          {/* 민간 구인 섹션 */}
+          {sourceTab === 'private' && (
             <>
-              <div className={styles.sectionTitle}>
-                <span className={styles.urgentBadge}>🔥 급구</span> 오늘 바로 시작
+              <div className={styles.catRow}>
+                {CATEGORIES.map(c => (
+                  <button
+                    key={c}
+                    className={`${styles.catBtn} ${category === c ? styles.catActive : ''}`}
+                    onClick={() => setCategory(c)}
+                  >
+                    {c}
+                  </button>
+                ))}
               </div>
-              {urgent.map(job => (
+
+              {urgent.length > 0 && (
+                <>
+                  <div className={styles.sectionTitle}>
+                    <span className={styles.urgentBadge}>🔥 급구</span> 오늘 바로 시작
+                  </div>
+                  {urgent.map(job => (
+                    <JobCard
+                      key={job.id}
+                      job={job}
+                      applied={applied.includes(job.id)}
+                      onClick={() => nav('job-detail', job)}
+                      onApply={(e) => {
+                        e.stopPropagation()
+                        setApplied(prev => [...prev, job.id])
+                      }}
+                    />
+                  ))}
+                </>
+              )}
+
+              <div className={styles.sectionTitle}>내 주변 일자리</div>
+              {normal.map(job => (
                 <JobCard
                   key={job.id}
                   job={job}
@@ -70,20 +113,58 @@ export default function SeniorHome({ nav }) {
             </>
           )}
 
-          {/* Normal jobs */}
-          <div className={styles.sectionTitle}>내 주변 일자리</div>
-          {normal.map(job => (
-            <JobCard
-              key={job.id}
-              job={job}
-              applied={applied.includes(job.id)}
-              onClick={() => nav('job-detail', job)}
-              onApply={(e) => {
-                e.stopPropagation()
-                setApplied(prev => [...prev, job.id])
-              }}
-            />
-          ))}
+          {/* 공공 일자리 섹션 */}
+          {sourceTab === 'public' && (
+            <>
+              <div className={styles.publicNotice}>
+                <span className={styles.publicNoticeIcon}>ℹ️</span>
+                한국노인인력개발원 공식 사업 · 수행기관에 직접 신청
+              </div>
+
+              {pubLoading && (
+                <div className={styles.loadingWrap}>
+                  <div className={styles.spinner} />
+                  <span>공공 일자리 불러오는 중...</span>
+                </div>
+              )}
+
+              {pubError && (
+                <div className={styles.errorBox}>
+                  <span>⚠️ 데이터를 불러오지 못했습니다</span>
+                  <span className={styles.errorSub}>{pubError}</span>
+                </div>
+              )}
+
+              {!pubLoading && !pubError && (
+                <>
+                  <div className={styles.catRow}>
+                    {PUBLIC_TYPES.map(t => (
+                      <button
+                        key={t}
+                        className={`${styles.catBtn} ${publicType === t ? styles.catActive : ''}`}
+                        onClick={() => setPublicType(t)}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className={styles.sectionTitle}>
+                    전국 노인일자리 사업
+                    <span className={styles.countBadge}>{filteredPublic.length}건</span>
+                  </div>
+                  {filteredPublic.map(job => (
+                    <PublicJobCard
+                      key={job.id}
+                      job={job}
+                      applied={applied.includes(job.id)}
+                      onApply={() => setApplied(prev => [...prev, job.id])}
+                    />
+                  ))}
+                </>
+              )}
+            </>
+          )}
         </div>
       )}
 
