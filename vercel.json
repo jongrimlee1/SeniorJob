@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/odcloud/:path*",
+      "destination": "https://api.odcloud.kr/:path*"
+    }
+  ]
+}
