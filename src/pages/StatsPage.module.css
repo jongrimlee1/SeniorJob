@@ -293,6 +293,61 @@
 }
 .retireNote span { color: #9CA3AF; font-size: 0.72rem; }
 
+/* ── Employer section ── */
+.employerBlockLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #155E75;
+  margin: 0.25rem 0 0.6rem;
+  padding-left: 8px;
+  border-left: 3px solid #0891B2;
+}
+.subsidyBox {
+  background: #ECFEFF;
+  border: 1px solid #A5F3FC;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 0.75rem;
+}
+.subsidyTitle {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #155E75;
+  margin-bottom: 10px;
+}
+.subsidyList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.subsidyItem {
+  background: white;
+  border: 1px solid #CFFAFE;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.subsidyName {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0E7490;
+  margin-bottom: 3px;
+}
+.subsidyDetail {
+  font-size: 0.72rem;
+  color: #4B5563;
+  line-height: 1.5;
+}
+.subsidyAmt {
+  display: inline-block;
+  margin-top: 6px;
+  background: #0891B2;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
 /* ── Timee grid (Section 5) ── */
 .timeeGrid {
   display: flex;

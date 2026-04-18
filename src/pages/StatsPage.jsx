@@ -206,7 +206,95 @@ export default function StatsPage({ nav, embedded = false }) {
         <div className={styles.sourceTag}>출처: 통계청 경제활동인구조사 고령층 부가조사 2025</div>
       </Section>
 
-      {/* ── Section 5: 해외 사례 ── */}
+      {/* ── Section 5: 고용주 관점 ── */}
+      <Section badge="🏢 고용주 관점" badgeColor="#0891B2" title="시니어 채용은 고용주에게도 득이다">
+        <p className={styles.desc}>
+          시니어 고용은 <strong>'사회 기여'가 아닌 경영 이득</strong>입니다.
+          인력난 · 낮은 이직률 · 정부 지원금이라는 세 축이 맞아떨어집니다.
+        </p>
+
+        {/* 1) 인력난 현실 */}
+        <div className={styles.employerBlockLabel}>① 일손이 부족하다</div>
+        <div className={styles.bigBarWrap}>
+          <div className={styles.bigBarLabel}>중소기업이 외국인을 고용하는 이유</div>
+          <div className={styles.bigBarTrack}>
+            <div className={styles.bigBarFill} style={{ width: '82.6%', background: '#0891B2' }}>
+              <span>82.6%</span>
+            </div>
+            <div className={styles.bigBarRest}>
+              <span>17.4%</span>
+            </div>
+          </div>
+          <div className={styles.bigBarLegend}>
+            <span className={styles.legendDot} style={{ background: '#0891B2' }} />내국인 구인난
+            <span className={styles.legendDot} style={{ background: '#E5E7EB', marginLeft: 12 }} />기타
+          </div>
+        </div>
+
+        <div className={styles.routeWrap} style={{ marginTop: '1rem' }}>
+          <div className={styles.bigBarLabel}>2025 하반기 채용 난항 업종 (채용 계획 없음·못 세움)</div>
+          {[
+            { label: '건설·토목', pct: 83.3 },
+            { label: '식료품', pct: 70.0 },
+            { label: '철강·금속', pct: 69.2 },
+            { label: '석유화학', pct: 68.7 },
+          ].map(({ label, pct }) => (
+            <div key={label} className={styles.routeRow}>
+              <div className={styles.routeLabel}>{label}</div>
+              <div className={styles.routeBarTrack}>
+                <div className={styles.routeBarFill} style={{ width: `${pct}%`, background: '#67E8F9' }}>
+                  <span style={{ color: '#155E75', fontSize: '0.72rem', fontWeight: 700 }}>{pct}%</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 2) 고령 근로자의 실증된 가치 */}
+        <div className={styles.employerBlockLabel} style={{ marginTop: '1.5rem' }}>② 편견과 다른 실증 데이터</div>
+        <div className={styles.cardGrid} style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+          <StatCard num="15" unit="년" label="평균 근속기간" note="50~60대 근로자" color="#0891B2" />
+          <StatCard num="↓" unit="" label="단기 결근율" note="55세+가 더 낮음" color="#0891B2" />
+          <StatCard num="=" unit="" label="생산성" note="연령 차이 없음" color="#0891B2" />
+        </div>
+        <div className={styles.callout} style={{ borderLeftColor: '#0891B2', background: '#ECFEFF' }}>
+          <span className={styles.calloutIcon}>✅</span>
+          <span>이직률이 낮다는 건 <strong>채용·교육 비용 절감</strong>을 뜻합니다.
+          74개 생산성 연구 메타분석은 <strong>연령에 따른 차이가 없다</strong>고 결론지었습니다.</span>
+        </div>
+
+        {/* 3) 정부 지원금 */}
+        <div className={styles.employerBlockLabel} style={{ marginTop: '1.5rem' }}>③ 정부가 인건비를 보조한다</div>
+        <div className={styles.subsidyBox}>
+          <div className={styles.subsidyTitle}>💰 시니어 고용 시 받을 수 있는 지원금</div>
+          <div className={styles.subsidyList}>
+            <div className={styles.subsidyItem}>
+              <div className={styles.subsidyName}>고령자 고용지원금</div>
+              <div className={styles.subsidyDetail}>60세 이상 근로자 1인당 분기 80만원 (우선지원대상기업) · 최대 1년</div>
+              <div className={styles.subsidyAmt}>연 최대 320만원 / 인</div>
+            </div>
+            <div className={styles.subsidyItem}>
+              <div className={styles.subsidyName}>고령자 계속고용장려금</div>
+              <div className={styles.subsidyDetail}>정년 이후 계속 고용 시 1인당 월 30만원 · 최대 3년</div>
+              <div className={styles.subsidyAmt}>최대 1,080만원 / 인</div>
+            </div>
+            <div className={styles.subsidyItem}>
+              <div className={styles.subsidyName}>시니어인턴십 (보건복지부)</div>
+              <div className={styles.subsidyDetail}>인턴지원금 · 채용지원금 · 장기취업유지지원금 단계별 지원</div>
+              <div className={styles.subsidyAmt}>인건비 단계별 보조</div>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.retireNote} style={{ background: '#ECFEFF', borderColor: '#A5F3FC', color: '#155E75' }}>
+          <strong>일하고 싶은 1,000만 시니어 × 인력난 중소기업 × 정부 지원금</strong><br />
+          <span style={{ color: '#0891B2' }}>시니어잡은 세 축을 연결하는 플랫폼입니다</span>
+        </div>
+
+        <div className={styles.sourceTag}>출처: 중소기업중앙회 · 전국경제인연합회 2025 · 고용노동부 2025 · AARP Value of Experience Study</div>
+      </Section>
+
+      {/* ── Section 6: 해외 사례 ── */}
       <Section badge="🇯🇵 해외 사례" badgeColor="#7C3AED" title="일본은 이미 해답을 찾았다">
         <p className={styles.desc}>
           일본의 <strong>타이미(Timee)</strong>는 '스키마바이토(빈틈 아르바이트)' 개념으로
@@ -291,6 +379,10 @@ export default function StatsPage({ nav, embedded = false }) {
           '통계청 — 장래인구추계',
           '국민연금연구원 — 적정 노후생활비 연구 2024',
           'OECD — Pensions at a Glance 2023',
+          '중소기업중앙회 — 외국인력 고용 실태조사 2025',
+          '전국경제인연합회 — 2025년 하반기 주요 기업 신규채용계획 조사',
+          '고용노동부 — 2025년 고용장려금 지원 제도',
+          'AARP — Value of Experience Study / BLS 2020 / 2021 생산성 메타분석(74편)',
           'Timee Inc. — IR 자료 2024',
         ].map((s, i) => (
           <div key={i} className={styles.sourceItem}>{i + 1}. {s}</div>
